@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_main);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         albums = DataManager.getAlbums(this);
 
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     a.setName(name);
                     DataManager.save(this);
                     adapter.notifyItemChanged(pos);
+                    Toast.makeText(this, "Album renamed", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     albums.remove(pos);
                     DataManager.save(this);
                     adapter.notifyItemRemoved(pos);
+                    Toast.makeText(this, "Album deleted", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

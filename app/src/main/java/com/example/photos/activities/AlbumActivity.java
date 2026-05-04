@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,8 +23,8 @@ public class AlbumActivity extends AppCompatActivity {
     private Album album;
     private PhotoAdapter adapter;
 
-    private final ActivityResultLauncher<String> pickImage = registerForActivityResult(
-            new ActivityResultContracts.GetContent(), uri -> {
+    private final ActivityResultLauncher<String[]> pickImage = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(), uri -> {
                 if (uri == null) return;
                 try {
                     getContentResolver().takePersistableUriPermission(
@@ -49,7 +48,11 @@ public class AlbumActivity extends AppCompatActivity {
         album = DataManager.findAlbum(this, name);
         if (album == null) { finish(); return; }
 
-        ((TextView) findViewById(R.id.txtAlbumTitle)).setText(album.getName());
+        setSupportActionBar(findViewById(R.id.toolbar));
+        setTitle(album.getName());
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         RecyclerView rv = findViewById(R.id.recyclerPhotos);
         rv.setLayoutManager(new GridLayoutManager(this, 3));
@@ -69,13 +72,19 @@ public class AlbumActivity extends AppCompatActivity {
         rv.setAdapter(adapter);
 
         ((Button) findViewById(R.id.btnAddPhoto)).setOnClickListener(v ->
-                pickImage.launch("image/*"));
+                pickImage.launch(new String[]{"image/*"}));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     private void showPhotoOptions(int pos) {
@@ -85,6 +94,7 @@ public class AlbumActivity extends AppCompatActivity {
                     album.getPhotos().remove(pos);
                     DataManager.save(this);
                     adapter.notifyItemRemoved(pos);
+                    Toast.makeText(this, "Photo removed", Toast.LENGTH_SHORT).show();
                 })
                 .show();
     }

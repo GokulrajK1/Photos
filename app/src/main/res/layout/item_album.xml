@@ -11,12 +11,22 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/txtAlbumCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textColor="#666666" />
+        android:textColor="#666666"
+        android:paddingEnd="12dp" />
+
+    <ImageView
+        android:id="@+id/btnAlbumMenu"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_more"
+        android:contentDescription="options"
+        android:background="?android:attr/selectableItemBackgroundBorderless" />
 </LinearLayout>

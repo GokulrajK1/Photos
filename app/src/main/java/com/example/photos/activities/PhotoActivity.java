@@ -1,6 +1,8 @@
 package com.example.photos.activities;
 
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.example.photos.model.DataManager;
 import com.example.photos.model.Photo;
 import com.example.photos.model.Tag;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +43,23 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_photo);
+        setSupportActionBar(findViewById(R.id.toolbar));
+        setTitle("Photo View");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         String name = getIntent().getStringExtra("albumName");
         index = getIntent().getIntExtra("photoIndex", 0);
+        
+        // Check if we are in "Search results" mode (no album name provided)
+        if (name == null) {
+            // In search result mode, we might want to handle this differently
+            // For now, assume it's always from an album per requirements
+            finish();
+            return;
+        }
+
         album = DataManager.findAlbum(this, name);
         if (album == null || album.size() == 0) { finish(); return; }
 
@@ -59,17 +76,45 @@ public class PhotoActivity extends AppCompatActivity {
         });
         ((Button) findViewById(R.id.btnAddTag)).setOnClickListener(v -> showAddTag());
         ((Button) findViewById(R.id.btnMove)).setOnClickListener(v -> showMove());
+        ((Button) findViewById(R.id.btnRemove)).setOnClickListener(v -> showRemoveConfirm());
 
         render();
     }
 
+    private void showRemoveConfirm() {
+        new AlertDialog.Builder(this)
+                .setTitle("Remove photo?")
+                .setMessage("Are you sure you want to remove this photo from the album?")
+                .setPositiveButton("Remove", (d, w) -> {
+                    album.getPhotos().remove(index);
+                    DataManager.save(this);
+                    if (album.size() == 0) {
+                        finish();
+                    } else {
+                        if (index >= album.size()) index = album.size() - 1;
+                        render();
+                    }
+                    Toast.makeText(this, "Photo removed", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     private void render() {
         Photo p = album.getPhotos().get(index);
-        try {
-            img.setImageURI(Uri.parse(p.getUriString()));
+        try (InputStream is = getContentResolver().openInputStream(Uri.parse(p.getUriString()))) {
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            img.setImageBitmap(bm);
         } catch (Exception e) {
             img.setImageResource(android.R.drawable.ic_menu_report_image);
         }
+        
         txtIndex.setText((index + 1) + " / " + album.size());
 
         tagAdapter = new TagAdapter(p.getTags(), pos -> {
@@ -147,6 +192,7 @@ public class PhotoActivity extends AppCompatActivity {
                     if (album.size() == 0) { finish(); return; }
                     if (index >= album.size()) index = album.size() - 1;
                     render();
+                    Toast.makeText(this, "Moved to " + target.getName(), Toast.LENGTH_SHORT).show();
                 })
                 .show();
     }

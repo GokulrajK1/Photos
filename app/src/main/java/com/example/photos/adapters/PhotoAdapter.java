@@ -1,7 +1,8 @@
 package com.example.photos.adapters;
 
-import com.bumptech.glide.Glide;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.photos.R;
 import com.example.photos.model.Photo;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.VH> {
@@ -44,21 +46,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         Photo p = photos.get(pos);
-
-        // Use Glide to load the image in the background
-        // Make sure to add: import com.bumptech.glide.Glide; at the top of your file
-        try {
-            Glide.with(ctx)
-                    .load(Uri.parse(p.getUriString()))
-                    .error(android.R.drawable.ic_menu_report_image) // Fallback if image fails
-                    .centerCrop()
-                    .into(h.img);
+        
+        try (InputStream is = ctx.getContentResolver().openInputStream(Uri.parse(p.getUriString()))) {
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            h.img.setImageBitmap(bm);
         } catch (Exception e) {
             h.img.setImageResource(android.R.drawable.ic_menu_report_image);
         }
 
-        // You have a minor warning here: getAdapterPosition() is technically deprecated.
-        // If you want to use the modern, warning-free version, change it to getBindingAdapterPosition()
         h.itemView.setOnClickListener(v -> listener.onClick(h.getBindingAdapterPosition()));
         h.itemView.setOnLongClickListener(v -> {
             listener.onLongClick(h.getBindingAdapterPosition());
