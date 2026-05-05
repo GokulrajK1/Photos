@@ -1,19 +1,8 @@
-# Photos — Android Port (CS 213, Assignment 4)
+# Photos — Android Port 
 
-Authors: Om Patel (oam47), [Partner Name] ([partner NetID])
+Authors: Om Patel onp12, Gokulraj Kumarassamy gk570 
 
-Android port of our JavaFX Photos project. Java only, Kotlin DSL build, single user, albums + photos + tag-based search with autocomplete.
-
-## How to Run
-1. Open in Android Studio.
-2. Use an emulator at 1080 x 2400, 420 dpi (Pixel 6 or Medium Phone), API 36 or 37.
-3. Run the `app` configuration.
-
-## GenAI Usage
-
-We used Anthropic Claude to assist in writing portions of this app. We did NOT vibe code — each prompt targeted a specific functional component (one layout, one activity, one adapter at a time), and we glued the components together ourselves.
-
-### Prompts by Om Patel (oam47)
+### Prompts by Om Patel 
 
 1. "Port my JavaFX Photos model classes (Tag, Photo, Album) to Android-compatible Java. Tag should only support 'person' and 'location' types, store name/value as lowercase trimmed strings, implement Serializable, and override equals/hashCode."
 
@@ -25,7 +14,7 @@ We used Anthropic Claude to assist in writing portions of this app. We did NOT v
 
 5. "Write MainActivity. It should load albums via DataManager, display them in the RecyclerView using AlbumAdapter, handle creating a new album via an AlertDialog with an EditText (reject empty names and duplicates), and handle long-click to show Rename/Delete options. Also wire up the Search button to launch SearchActivity."
 
-### Prompts by [Partner Name] ([partner NetID])
+### Prompts by Gokul Kumarassamy
 
 1. "Build activity_album.xml with the album title at the top, an Add Photo button, and a RecyclerView displayed as a 3-column grid. Also build item_photo.xml as a FrameLayout with an ImageView for the thumbnail (centerCrop scaleType, 180dp height)."
 
